@@ -1,68 +1,349 @@
-/* Basic reset and layout */
+/* Import a modern sans-serif from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Base body */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
-  padding: 1rem;
-  background-color: #eef2f5;
+  padding: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #4a90e2 0%, #50e3c2 100%);
+  color: #333;
+  line-height: 1.6;
 }
 
+/* Pull content below fixed header */
+main {
+  padding-top: 80px;
+}
+
+/* Header */
 header {
-  text-align: center;
-  margin-bottom: 1rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 100;
 }
 
-form {
+.navbar {
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center;
-  margin-bottom: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
 }
 
-input, select, button {
-  padding: 0.5rem;
-  font-size: 1rem;
+.logo {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #000000;
+  letter-spacing: 1px;
 }
 
-button {
-  cursor: pointer;
-  background-color: #007acc;
+/* Logout button */
+#logout-btn {
+  display: none;
+  background-color: #e74c3c;
   color: #fff;
   border: none;
-  border-radius: 3px;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-button:hover {
-  background-color: #005fa3;
+#logout-btn:hover {
+  background-color: #c0392b;
 }
 
+/* Card layout for login/signup */
+#login-section,
+#signup-section {
+  background-color: #ffffff;
+  padding: 3rem 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin: 3rem auto;
+}
+
+#login-section:hover,
+#signup-section:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 25px 90px rgba(0, 0, 0, 0.18);
+}
+
+/* Titles */
+#login-section h1,
+#signup-section h1 {
+  font-size: 2.2rem;
+  color: #4a90e2;
+  margin-bottom: 2rem;
+  font-weight: 700;
+}
+
+/* Inputs & select for login/signup */
+#login-form input,
+#signup-form input,
+#signup-form select {
+  width: 100%;
+  padding: 0.9rem 1.2rem;
+  margin-bottom: 1.2rem;
+  border-radius: 16px;
+  border: 1px solid #d1d9e6;
+  background-color: #f5f8ff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+}
+
+#login-form input:focus,
+#signup-form input:focus,
+#signup-form select:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 12px rgba(74,144,226,0.3), inset 0 2px 6px rgba(0,0,0,0.05);
+}
+
+#login-form input:hover,
+#signup-form input:hover,
+#signup-form select:hover {
+  background-color: #eef4ff;
+}
+
+#login-form input::placeholder,
+#signup-form input::placeholder,
+#signup-form select::placeholder {
+  color: #a0a8b9;
+  opacity: 1;
+  font-weight: 400;
+  font-size: 0.95rem;
+}
+
+/* Buttons */
+#login-form button,
+#signup-form button {
+  width: 100%;
+  padding: 0.85rem 0;
+  border-radius: 14px;
+  border: none;
+  background-color: #4a90e2;
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#login-form button:hover,
+#signup-form button:hover {
+  background-color: #357ab8;
+  transform: scale(1.03);
+}
+
+/* Links below form */
+#login-section p,
+#signup-section p {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+#login-section a,
+#signup-section a {
+  color: #4a90e2;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+#login-section a:hover,
+#signup-section a:hover {
+  text-decoration: underline;
+}
+
+/* Main app section */
+#app-section {
+  width: 100%;
+  margin: 2rem auto;
+  padding: 0;
+}
+
+.app-container {
+  display: flex;
+  min-height: 70vh;
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* Sidebar */
+#sidebar {
+  width: 240px;
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  flex-shrink: 0;
+  transition: width 0.3s ease;
+}
+
+#sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#sidebar li {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+#sidebar a {
+  display: block;
+  padding: 1rem 1.5rem;
+  color: inherit;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+#sidebar a:hover,
+#sidebar a.active {
+  background-color: #34495e;
+  border-left: 4px solid #4a90e2;
+}
+
+/* Main content */
+#main-content {
+  flex: 1;
+  padding: 2.5rem;
+}
+
+.panel h2 {
+  color: #4a90e2;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+/* Tables */
+#report-table,
 #visitor-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.03);
 }
 
-#visitor-table th, #visitor-table td {
-  border: 1px solid #ccc;
-  padding: 0.5rem;
+#report-table th,
+#report-table td,
+#visitor-table th,
+#visitor-table td {
+  border: none;
+  padding: 0.75rem 1rem;
   text-align: left;
 }
 
+#visitor-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
 #visitor-table th {
-  background-color: #f0f0f0;
+  background-color: #f0f4f8;
+  color: #333;
+  font-weight: 600;
 }
 
-#login-section {
-  max-width: 300px;
-  margin: 0 auto;
+/* Buttons inside tables */
+.checkout {
+  background-color: #4a90e2;
+  color: #fff;
+  border: none;
+  padding: 0.35rem 0.7rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-#app-section {
-  max-width: 800px;
-  margin: 0 auto;
+.checkout:hover {
+  background-color: #357ab8;
+  transform: scale(1.05);
 }
 
-#user-info {
-  text-align: right;
+/* -------------------------
+   Visitor Form Styling
+-------------------------- */
+#visitor-form input,
+#visitor-form select,
+#visitor-form textarea {
+  width: 100%;
+  padding: 0.85rem 1.2rem;
   margin-bottom: 1rem;
+  border-radius: 14px;
+  border: 1px solid #d1d9e6;
+  background-color: #f5f8ff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+}
+
+#visitor-form input:focus,
+#visitor-form select:focus,
+#visitor-form textarea:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 12px rgba(74,144,226,0.3), inset 0 2px 6px rgba(0,0,0,0.05);
+}
+
+#visitor-form input:hover,
+#visitor-form select:hover,
+#visitor-form textarea:hover {
+  background-color: #eef4ff;
+}
+
+#visitor-form input::placeholder,
+#visitor-form select::placeholder,
+#visitor-form textarea::placeholder {
+  color: #a0a8b9;
+  opacity: 1;
+  font-weight: 400;
+  font-size: 0.95rem;
+}
+
+#visitor-form button {
+  background-color: #4a90e2;
+  color: #fff;
+  border: none;
+  padding: 0.85rem 0;
+  border-radius: 14px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#visitor-form button:hover {
+  background-color: #357ab8;
+  transform: scale(1.03);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  #sidebar {
+    width: 100%;
+  }
+
+  #visitor-form,
+  #search-form {
+    grid-template-columns: 1fr;
+  }
 }

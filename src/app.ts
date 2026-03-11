@@ -30,10 +30,26 @@ function showSection(id: string, show: boolean) {
 
 function renderUserInfo() {
   const info = document.getElementById('user-info');
-  if (info && currentUser) {
-    info.textContent = `Logged in as ${currentUser.username} (${currentUser.role})`;
+  const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement | null;
+  if (info) {
+    if (currentUser) {
+      info.textContent = `Logged in as ${currentUser.username} (${currentUser.role})`;
+      if (logoutBtn) logoutBtn.style.display = '';
+    } else {
+      info.textContent = '';
+      if (logoutBtn) logoutBtn.style.display = 'none';
+    }
   }
 }
+
+// handle logout button click
+const logoutBtn = document.getElementById('logout-btn');
+logoutBtn?.addEventListener('click', () => {
+  currentUser = null;
+  showSection('app-section', false);
+  showSection('login-section', true);
+  renderUserInfo();
+});
 
 async function loadVisitors(filter: { name?: string; date?: string } = {}) {
   let url = '/api/visitors';
@@ -90,6 +106,39 @@ showLoginLink?.addEventListener('click', (e) => {
   showSection('login-section', true);
 });
 
+// panel switching for sidebar
+function showPanel(panelId: string) {
+  document.querySelectorAll('#main-content .panel').forEach((p) => {
+    (p as HTMLElement).style.display = 'none';
+  });
+  const panel = document.getElementById(panelId) as HTMLElement;
+  if (panel) {
+    panel.style.display = '';
+  }
+  // update active link
+  document.querySelectorAll('#sidebar a').forEach((a) => {
+    if ((a as HTMLAnchorElement).dataset.panel === panelId) {
+      a.classList.add('active');
+    } else {
+      a.classList.remove('active');
+    }
+  });
+}
+
+document.querySelectorAll('#sidebar a').forEach((link) => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = (e.currentTarget as HTMLAnchorElement).dataset.panel;
+    if (target) showPanel(target);
+  });
+});
+
+// default panel when entering app
+function goToDashboard() {
+  showPanel('panel-register');
+}
+
+
 // login
 const loginForm = document.getElementById('login-form') as HTMLFormElement;
 loginForm.addEventListener('submit', async (e) => {
@@ -106,6 +155,7 @@ loginForm.addEventListener('submit', async (e) => {
       showSection('login-section', false);
       showSection('app-section', true);
       renderUserInfo();
+      goToDashboard();
       loadVisitors();
     } else {
       alert('Login failed');
@@ -167,4 +217,24 @@ searchForm.addEventListener('submit', (e) => {
   if (name) filter.name = name;
   if (date) filter.date = date;
   loadVisitors(filter);
+});
+
+// report generation
+const reportForm = document.getElementById('report-form') as HTMLFormElement;
+reportForm?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const date = (document.getElementById('report-date') as HTMLInputElement).value;
+  const data: Visitor[] = await api(`/api/visitors?date=${date}`);
+  const tbody = document.querySelector('#report-table tbody') as HTMLElement;
+  tbody.innerHTML = '';
+  data.forEach((v) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${v.name}</td>
+      <td>${v.date}</td>
+      <td>${v.timeIn}</td>
+      <td>${v.timeOut || ''}</td>
+    `;
+    tbody.appendChild(tr);
+  });
 });
