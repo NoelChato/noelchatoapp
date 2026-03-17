@@ -1,135 +1,266 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Visitor Logbook</title>
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visitor Logbook</title>
+
+<link rel="stylesheet" href="styles.css">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 <body>
 
 <header>
-  <nav class="navbar">
-    <div class="logo">Visitor Logbook</div>
-    <div id="user-info"></div>
-    <button id="logout-btn">Logout</button>
-  </nav>
+<nav class="navbar">
+<div class="logo">Visitor Logbook</div>
+<div id="user-info"></div>
+
+<button id="logout-btn" style="display:none;">
+    Logout
+</button>
+</nav>
 </header>
 
 <main>
 
 <!-- LOGIN -->
 <section id="login-section">
-  <h1>Sign In</h1>
-  <form id="login-form">
-    <input type="text" id="login-username" placeholder="Username" required />
-    <input type="password" id="login-password" placeholder="Password" required />
-    <button type="submit">Login</button>
-  </form>
+<h1>Sign In</h1>
 
-  <p style="text-align:center;">
-    or <a href="#" id="show-signup">Sign up</a>
-  </p>
+<form id="login-form">
+<input type="text" id="login-username" placeholder="Username" required>
+<input type="password" id="login-password" placeholder="Password" required>
+<button type="submit">Login</button>
+</form>
+
+<p style="text-align:center;">
+or <a href="#" id="show-signup">Sign up</a>
+</p>
+
 </section>
+
 
 <!-- SIGNUP -->
 <section id="signup-section" style="display:none;">
-  <h1>Create Account</h1>
-  <form id="signup-form">
-    <input type="text" id="signup-username" placeholder="Username" required />
-    <input type="password" id="signup-password" placeholder="Password" required />
 
-    <select id="signup-role">
-      <option value="guard">Guard</option>
-      <option value="admin">Administrator</option>
-    </select>
+<h1>Create Account</h1>
 
-    <button type="submit">Sign Up</button>
-  </form>
+<form id="signup-form">
 
-  <p style="text-align:center;">
-    or <a href="#" id="show-login">Login</a>
-  </p>
+<input type="text" id="signup-username" placeholder="Username" required>
+<input type="password" id="signup-password" placeholder="Password" required>
+
+<select id="signup-role">
+<option value="guard">Guard</option>
+<option value="admin">Administrator</option>
+</select>
+
+<button type="submit">Sign Up</button>
+
+</form>
+
+<p style="text-align:center;">
+or <a href="#" id="show-login">Login</a>
+</p>
+
 </section>
+
+
 
 <!-- MAIN APP -->
 <section id="app-section" style="display:none;">
-  <div class="app-container">
-    <!-- sidebar -->
-    <nav id="sidebar">
-      <ul>
-        <li><a href="#" data-panel="panel-register">Register Visitor</a></li>
-        <li><a href="#" data-panel="panel-log">Visitor Log</a></li>
-        <li><a href="#" data-panel="panel-reports">Reports</a></li>
-        <li><a href="#" data-panel="panel-settings">Settings</a></li>
-      </ul>
-    </nav>
 
-    <!-- main dashboard panels -->
-    <div id="main-content">
-      <div id="panel-register" class="panel">
-        <h2>Register Visitor</h2>
-        <form id="visitor-form">
-          <input type="text" id="name" placeholder="Visitor name" required />
-          <input type="text" id="address" placeholder="Address" required />
-          <input type="text" id="contact" placeholder="Contact number" required />
-          <input type="text" id="purpose" placeholder="Purpose of visit" required />
-          <input type="text" id="person" placeholder="Person to visit" required />
-          <input type="date" id="date" required />
-          <input type="time" id="timein" required />
-          <button type="submit">Register</button>
-        </form>
-      </div>
+<div class="app-container">
 
-      <div id="panel-log" class="panel" style="display:none;">
-        <h2>Visitor Log</h2>
-        <form id="search-form">
-          <input type="text" id="search-name" placeholder="Name" />
-          <input type="date" id="search-date" />
-          <button type="submit">Search</button>
-        </form>
-        <table id="visitor-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Address</th>
-              <th>Contact</th>
-              <th>Purpose</th>
-              <th>Person</th>
-              <th>Date</th>
-              <th>In</th>
-              <th>Out</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+<!-- SIDEBAR -->
+<nav id="sidebar">
 
-      <div id="panel-reports" class="panel" style="display:none;">
-        <h2>Daily Report</h2>
-        <form id="report-form">
-          <input type="date" id="report-date" />
-          <button type="submit">Generate</button>
-        </form>
-        <table id="report-table">
-          <thead>
-            <tr><th>Name</th><th>Date</th><th>Time In</th><th>Time Out</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+<ul>
 
-      <div id="panel-settings" class="panel" style="display:none;">
-        <h2>Settings</h2>
-        <p>Feature placeholders (e.g. password change, user management) go here.</p>
-      </div>
-    </div>
-  </div>
+<li><a href="#" data-panel="panel-dashboard">Dashboard</a></li>
+<li><a href="#" data-panel="panel-register">Register Visitor</a></li>
+<li><a href="#" data-panel="panel-log">Visitor Log</a></li>
+<li><a href="#" data-panel="panel-reports">Reports</a></li>
+<li><a href="#" data-panel="panel-settings">Settings</a></li>
+
+</ul>
+
+</nav>
+
+
+
+<!-- MAIN CONTENT -->
+<div id="main-content">
+
+<!-- DASHBOARD -->
+<div id="panel-dashboard" class="panel">
+
+<h2>Dashboard</h2>
+
+<div class="dashboard">
+
+<div class="stat-card">
+<div class="stat-title">Visitors Today</div>
+<div class="stat-value" id="stat-today">0</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-title">Visitors Inside</div>
+<div class="stat-value" id="stat-inside">0</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-title">Checked Out</div>
+<div class="stat-value" id="stat-out">0</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-title">Total Visitors</div>
+<div class="stat-value" id="stat-total">0</div>
+</div>
+
+</div>
+
+
+<div class="dashboard-row">
+
+<div class="card">
+<h3>Visitor Trend</h3>
+<canvas id="visitorChart"></canvas>
+</div>
+
+<div class="card">
+<h3>Recent Activity</h3>
+
+<table class="data-table">
+
+<thead>
+<tr>
+<th>Name</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody id="recent-visitors"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- REGISTER -->
+<div id="panel-register" class="panel" style="display:none;">
+
+<h2>Register Visitor</h2>
+
+<form id="visitor-form">
+
+<input type="text" id="name" placeholder="Visitor name" required>
+<input type="text" id="address" placeholder="Address" required>
+<input type="text" id="contact" placeholder="Contact number" required>
+<input type="text" id="purpose" placeholder="Purpose of visit" required>
+<input type="text" id="person" placeholder="Person to visit" required>
+<input type="date" id="date" required>
+<input type="time" id="timein" required>
+
+<button type="submit">Register</button>
+
+</form>
+
+</div>
+
+
+
+<!-- VISITOR LOG -->
+<div id="panel-log" class="panel" style="display:none;">
+
+<h2>Visitor Log</h2>
+
+<form id="search-form">
+
+<input type="text" id="search-name" placeholder="Name">
+<input type="date" id="search-date">
+
+<button type="submit">Search</button>
+
+</form>
+
+<table id="visitor-table">
+
+<thead>
+
+<tr>
+<th>Name</th>
+<th>Address</th>
+<th>Contact</th>
+<th>Purpose</th>
+<th>Person</th>
+<th>Date</th>
+<th>In</th>
+<th>Out</th>
+<th>Actions</th>
+</tr>
+
+</thead>
+
+<tbody></tbody>
+
+</table>
+
+</div>
+
+
+
+<!-- REPORTS -->
+<div id="panel-reports" class="panel" style="display:none;">
+
+<h2>Daily Report</h2>
+
+<form id="report-form">
+<input type="date" id="report-date">
+<button type="submit">Generate</button>
+</form>
+
+<table id="report-table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Date</th>
+<th>Time In</th>
+<th>Time Out</th>
+</tr>
+</thead>
+
+<tbody></tbody>
+</table>
+
+</div>
+
+
+
+<!-- SETTINGS -->
+<div id="panel-settings" class="panel" style="display:none;">
+
+<h2>Settings</h2>
+<p>Feature placeholders go here.</p>
+
+</div>
+
+</div>
+</div>
+
 </section>
+
 </main>
 
-<!-- LOAD JS AFTER HTML -->
 <script src="app.js"></script>
 
 </body>
