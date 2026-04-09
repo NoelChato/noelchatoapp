@@ -35,8 +35,8 @@ export class AuthController {
   async login(@Body() body: { username?: string; password?: string }) {
     validateLoginBody(body);
     const user = await this.authService.validateUser(
-      body.username,
-      body.password,
+      body.username!,
+      body.password!,
     );
     return { success: true, user };
   }
@@ -47,9 +47,9 @@ export class AuthController {
   ) {
     validateSignupBody(body);
     const user = await this.authService.signup(
-      body.username,
-      body.password,
-      body.role,
+      body.username!,
+      body.password!,
+      body.role!,
     );
     const { password, ...rest } = user;
     return { success: true, user: rest };

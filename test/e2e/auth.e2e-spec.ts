@@ -1,9 +1,11 @@
+import { describe, beforeAll, afterAll, it, expect } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../../src/auth/auth.module';
 import { UserEntity } from '../../src/entities/user.entity';
+import type { Request, Response, NextFunction } from 'express';
 
 describe('Auth (e2e)', () => {
   let app: INestApplication;
@@ -23,7 +25,7 @@ describe('Auth (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.use((req, res, next) => {
+    app.use((req: Request, res: Response, next: NextFunction) => {
       res.setHeader('X-Content-Type-Options', 'nosniff');
       res.setHeader('X-Frame-Options', 'DENY');
       next();
@@ -181,7 +183,7 @@ describe('Auth (e2e)', () => {
 
   describe('Rate Limiting', () => {
     it('should handle rapid authentication attempts', async () => {
-      const promises = Array(10).fill().map(() =>
+      const promises = Array(10).fill(null).map(() =>
         request(app.getHttpServer())
           .post('/api/auth/login')
           .send({

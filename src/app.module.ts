@@ -22,7 +22,7 @@ import { UserEntity } from './entities/user.entity';
     }),
 
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'src'),
+      rootPath: join(process.cwd(), 'src'),
       serveRoot: '/',
     }),
 

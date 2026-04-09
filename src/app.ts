@@ -219,22 +219,213 @@ searchForm.addEventListener('submit', (e) => {
   loadVisitors(filter);
 });
 
-// report generation
+// reports
 const reportForm = document.getElementById('report-form') as HTMLFormElement;
+const reportFrom = document.getElementById('report-from') as HTMLInputElement;
+const reportTo = document.getElementById('report-to') as HTMLInputElement;
+const reportStatus = document.getElementById('report-status') as HTMLSelectElement;
+const reportSearch = document.getElementById('report-search') as HTMLInputElement;
+const reportTableBody = document.querySelector('#report-table tbody') as HTMLElement;
+const reportLoading = document.getElementById('report-loading') as HTMLElement;
+const reportEmpty = document.getElementById('report-empty') as HTMLElement;
+const exportExcelBtn = document.getElementById('export-excel-btn') as HTMLElement;
+const exportPdfBtn = document.getElementById('export-pdf-btn') as HTMLElement;
+const exportPrintBtn = document.getElementById('export-print-btn') as HTMLElement;
+const reportPrevBtn = document.getElementById('report-prev-btn') as HTMLElement;
+const reportNextBtn = document.getElementById('report-next-btn') as HTMLElement;
+const reportPageInfo = document.getElementById('report-page-info') as HTMLElement;
+
+let reportRows: any[] = [];
+let reportPage = 1;
+const reportPageSize = 8;
+let reportSortKey = 'name';
+let reportSortDirection = 1;
+
+function getReportFilterParams() {
+  const params = new URLSearchParams();
+  if (reportFrom?.value) params.set('from', reportFrom.value);
+  if (reportTo?.value) params.set('to', reportTo.value);
+  if (reportStatus?.value) params.set('status', reportStatus.value);
+  return params.toString();
+}
+
+function getFilteredReports() {
+  const searchValue = reportSearch?.value.trim().toLowerCase() || '';
+  return reportRows.filter((row) => {
+    if (!searchValue) return true;
+    return (
+      row.name.toLowerCase().includes(searchValue) ||
+      row.purpose.toLowerCase().includes(searchValue)
+    );
+  });
+}
+
+function sortReportRows(rows: any[]) {
+  return rows.slice().sort((a, b) => {
+    const valueA = a[reportSortKey] || '';
+    const valueB = b[reportSortKey] || '';
+    if (valueA < valueB) return -1 * reportSortDirection;
+    if (valueA > valueB) return 1 * reportSortDirection;
+    return 0;
+  });
+}
+
+function renderReportTable() {
+  if (!reportTableBody || !reportEmpty || !reportPageInfo) return;
+
+  const rows = sortReportRows(getFilteredReports());
+  const totalPages = Math.max(1, Math.ceil(rows.length / reportPageSize));
+  if (reportPage > totalPages) reportPage = totalPages;
+
+  const start = (reportPage - 1) * reportPageSize;
+  const visibleRows = rows.slice(start, start + reportPageSize);
+
+  reportTableBody.innerHTML = '';
+
+  if (!visibleRows.length) {
+    reportEmpty.style.display = 'block';
+  } else {
+    reportEmpty.style.display = 'none';
+    visibleRows.forEach((row) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${row.name}</td>
+        <td>${row.purpose}</td>
+        <td>${row.timeIn}</td>
+        <td>${row.timeOut}</td>
+        <td>${row.duration}</td>
+        <td>${row.status}</td>
+      `;
+      reportTableBody.appendChild(tr);
+    });
+  }
+
+  reportPageInfo.textContent = `Page ${reportPage} of ${totalPages}`;
+  if (reportPrevBtn) (reportPrevBtn as HTMLButtonElement).disabled = reportPage <= 1;
+  if (reportNextBtn) (reportNextBtn as HTMLButtonElement).disabled = reportPage >= totalPages;
+}
+
+async function loadReports() {
+  if (!reportLoading || !reportEmpty || !reportTableBody) return;
+
+  reportLoading.style.display = 'block';
+  reportEmpty.style.display = 'none';
+  reportTableBody.innerHTML = '';
+
+  try {
+    const query = getReportFilterParams();
+    const url = `/api/reports${query ? `?${query}` : ''}`;
+    const data = await api(url);
+    reportRows = Array.isArray(data) ? data : [];
+    reportPage = 1;
+    renderReportTable();
+  } catch (error) {
+    reportEmpty.textContent = 'Unable to load report data.';
+    reportEmpty.style.display = 'block';
+  } finally {
+    reportLoading.style.display = 'none';
+  }
+}
+
+function getReportExportRows() {
+  return getFilteredReports().map((row) => ({
+    'Visitor Name': row.name,
+    Purpose: row.purpose,
+    'Time In': row.timeIn,
+    'Time Out': row.timeOut,
+    Duration: row.duration,
+    Status: row.status,
+    Date: row.date,
+  }));
+}
+
+function exportReportsToExcel() {
+  const xlsx = (window as any).XLSX;
+  if (!xlsx) {
+    alert('Excel export is unavailable.');
+    return;
+  }
+
+  const sheet = xlsx.utils.json_to_sheet(getReportExportRows());
+  const workbook = xlsx.utils.book_new();
+  xlsx.utils.book_append_sheet(workbook, sheet, 'Visitor Reports');
+  xlsx.writeFile(workbook, `visitor-reports-${new Date().toISOString().slice(0, 10)}.xlsx`);
+}
+
+function exportReportsToPdf() {
+  const jspdfLib = (window as any).jspdf;
+  const jsPDF = jspdfLib?.jsPDF;
+  if (!jsPDF) {
+    alert('PDF export is unavailable.');
+    return;
+  }
+
+  const doc = new jsPDF();
+  if (typeof (doc as any).autoTable !== 'function') {
+    alert('PDF export is unavailable.');
+    return;
+  }
+  const rows = getFilteredReports().map((row) => [
+    row.name,
+    row.purpose,
+    row.timeIn,
+    row.timeOut,
+    row.duration,
+    row.status,
+  ]);
+
+  doc.setFontSize(14);
+  doc.text('Visitor Reports', 14, 20);
+  doc.autoTable({
+    head: [['Visitor Name', 'Purpose', 'Time In', 'Time Out', 'Duration', 'Status']],
+    body: rows,
+    startY: 28,
+    styles: { fontSize: 8 },
+    headStyles: { fillColor: [74, 144, 226] },
+  });
+  doc.save(`visitor-reports-${new Date().toISOString().slice(0, 10)}.pdf`);
+}
+
+function exportReportsToPrint() {
+  window.print();
+}
+
 reportForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const date = (document.getElementById('report-date') as HTMLInputElement).value;
-  const data: Visitor[] = await api(`/api/visitors?date=${date}`);
-  const tbody = document.querySelector('#report-table tbody') as HTMLElement;
-  tbody.innerHTML = '';
-  data.forEach((v) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${v.name}</td>
-      <td>${v.date}</td>
-      <td>${v.timeIn}</td>
-      <td>${v.timeOut || ''}</td>
-    `;
-    tbody.appendChild(tr);
+  await loadReports();
+});
+
+reportSearch?.addEventListener('input', () => {
+  reportPage = 1;
+  renderReportTable();
+});
+
+reportPrevBtn?.addEventListener('click', () => {
+  if (reportPage > 1) {
+    reportPage -= 1;
+    renderReportTable();
+  }
+});
+
+reportNextBtn?.addEventListener('click', () => {
+  reportPage += 1;
+  renderReportTable();
+});
+
+exportExcelBtn?.addEventListener('click', exportReportsToExcel);
+exportPdfBtn?.addEventListener('click', exportReportsToPdf);
+exportPrintBtn?.addEventListener('click', exportReportsToPrint);
+
+document.querySelectorAll('#report-table th.sortable').forEach((th) => {
+  th.addEventListener('click', () => {
+    const key = th.getAttribute('data-sort-key');
+    if (!key) return;
+    if (reportSortKey === key) {
+      reportSortDirection *= -1;
+    } else {
+      reportSortKey = key;
+      reportSortDirection = 1;
+    }
+    renderReportTable();
   });
 });

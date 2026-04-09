@@ -9,6 +9,9 @@
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
 </head>
 <body>
@@ -184,7 +187,7 @@ or <a href="#" id="show-login">Login</a>
 
 <h2>Visitor Log</h2>
 
-<form id="search-form">
+<form id="search-form" onsubmit="return false;">
 
 <input type="text" id="search-name" placeholder="Name">
 <input type="date" id="search-date">
@@ -222,25 +225,56 @@ or <a href="#" id="show-login">Login</a>
 <!-- REPORTS -->
 <div id="panel-reports" class="panel" style="display:none;">
 
-<h2>Daily Report</h2>
+<h2>Visitor Reports</h2>
 
-<form id="report-form">
-<input type="date" id="report-date">
-<button type="submit">Generate</button>
-</form>
+<div class="report-filters">
+  <div class="filter-row">
+    <label>From</label>
+    <input type="date" id="report-from">
+    <label>To</label>
+    <input type="date" id="report-to">
+    <label>Status</label>
+    <select id="report-status">
+      <option value="all">All</option>
+      <option value="inside">Inside</option>
+      <option value="out">Checked Out</option>
+    </select>
+  </div>
+
+  <div class="filter-row">
+    <input type="text" id="report-search" placeholder="Search name or purpose">
+    <button type="submit" id="report-filter-btn" class="primary-btn">Filter</button>
+  </div>
+</div>
+
+<div class="report-actions">
+  <button id="export-excel-btn" type="button">Export Excel</button>
+  <button id="export-pdf-btn" type="button">Export PDF</button>
+  <button id="export-print-btn" type="button">Print</button>
+</div>
+
+<div id="report-loading" class="info-message" style="display:none;">Loading reports...</div>
+<div id="report-empty" class="info-message" style="display:none;">No data found</div>
 
 <table id="report-table">
 <thead>
 <tr>
-<th>Name</th>
-<th>Date</th>
-<th>Time In</th>
-<th>Time Out</th>
+<th class="sortable" data-sort-key="name">Visitor Name</th>
+<th class="sortable" data-sort-key="purpose">Purpose of Visit</th>
+<th class="sortable" data-sort-key="timeIn">Time In</th>
+<th class="sortable" data-sort-key="timeOut">Time Out</th>
+<th class="sortable" data-sort-key="duration">Duration</th>
+<th class="sortable" data-sort-key="status">Status</th>
 </tr>
 </thead>
-
 <tbody></tbody>
 </table>
+
+<div class="pagination-controls">
+  <button id="report-prev-btn" type="button">Previous</button>
+  <span id="report-page-info">Page 1</span>
+  <button id="report-next-btn" type="button">Next</button>
+</div>
 
 </div>
 

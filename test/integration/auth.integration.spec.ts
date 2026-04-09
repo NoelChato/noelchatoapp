@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuthModule } from '../../src/auth/auth.module';
@@ -53,8 +53,8 @@ describe('AuthModule (Integration)', () => {
       // Verify user was created in database
       const user = await userRepository.findOneBy({ username: 'testuser' });
       expect(user).toBeDefined();
-      expect(user.username).toBe(signupData.username);
-      expect(user.role).toBe(signupData.role);
+      expect(user?.username).toBe(signupData.username);
+      expect(user?.role).toBe(signupData.role);
     });
 
     it('should validate required fields', async () => {
