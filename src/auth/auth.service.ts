@@ -25,4 +25,24 @@ export class AuthService {
     const user = this.userRepo.create({ username, password: hash, role });
     return this.userRepo.save(user);
   }
+
+  async updateProfile(
+    userId: number,
+    email?: string,
+    phone?: string,
+    bio?: string,
+    profilePicture?: string,
+  ) {
+    const user = await this.userRepo.findOneBy({ id: userId });
+    if (!user) throw new UnauthorizedException('User not found');
+
+    if (email) user.email = email;
+    if (phone) user.phone = phone;
+    if (bio) user.bio = bio;
+    if (profilePicture) user.profilePicture = profilePicture;
+
+    await this.userRepo.save(user);
+    const { password: _, ...rest } = user;
+    return rest;
+  }
 }

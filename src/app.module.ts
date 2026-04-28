@@ -26,6 +26,11 @@ import { UserEntity } from './entities/user.entity';
       serveRoot: '/',
     }),
 
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/uploads',
+    }),
+
     AuthModule,
     VisitorModule,
   ],

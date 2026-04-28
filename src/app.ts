@@ -12,7 +12,17 @@ interface Visitor {
   timeOut?: string;
 }
 
-let currentUser: { username: string; role: string } | null = null;
+interface User {
+  id: number;
+  username: string;
+  role: string;
+  email?: string;
+  phone?: string;
+  bio?: string;
+  profilePicture?: string;
+}
+
+let currentUser: User | null = null;
 
 async function api(path: string, options: any = {}) {
   const res = await fetch(path, {
@@ -33,10 +43,15 @@ function renderUserInfo() {
   const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement | null;
   if (info) {
     if (currentUser) {
-      info.textContent = `Logged in as ${currentUser.username} (${currentUser.role})`;
+      const icon = currentUser.profilePicture
+        ? currentUser.profilePicture
+        : currentUser.role === 'admin'
+        ? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
+        : 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
+      info.innerHTML = `<img src="${icon}" style="width:36px;height:36px;border-radius:50%;cursor:pointer;" title="${currentUser.username} (${currentUser.role})" alt="Profile">`;
       if (logoutBtn) logoutBtn.style.display = '';
     } else {
-      info.textContent = '';
+      info.innerHTML = '';
       if (logoutBtn) logoutBtn.style.display = 'none';
     }
   }
@@ -429,3 +444,143 @@ document.querySelectorAll('#report-table th.sortable').forEach((th) => {
     renderReportTable();
   });
 });
+
+// Profile modal functionality
+const profileIconDiv = document.getElementById('user-info') as HTMLElement | null;
+const profileModal = document.getElementById('profile-modal') as HTMLElement | null;
+const profileModalClose = document.getElementById('profile-modal-close') as HTMLElement | null;
+const profilePicBtn = document.getElementById('profile-pic-btn') as HTMLButtonElement | null;
+const profilePicInput = document.getElementById('profile-pic-input') as HTMLInputElement | null;
+const profileDisplayPic = document.getElementById('profile-display-pic') as HTMLImageElement | null;
+const profileForm = document.getElementById('profile-form') as HTMLFormElement | null;
+
+let userProfileData: any = {
+  email: '',
+  phone: '',
+  bio: '',
+  profilePicture: null
+};
+
+// Open profile modal
+if (profileIconDiv) {
+  profileIconDiv.addEventListener('click', () => {
+    if (currentUser && profileModal) {
+      profileModal.style.display = 'flex';
+      loadProfileData();
+    }
+  });
+}
+
+// Close modal
+if (profileModalClose) {
+  profileModalClose.addEventListener('click', () => {
+    if (profileModal) profileModal.style.display = 'none';
+  });
+}
+
+// Close modal on outside click
+if (profileModal) {
+  profileModal.addEventListener('click', (e) => {
+    if (e.target === profileModal) {
+      profileModal.style.display = 'none';
+    }
+  });
+}
+
+// Open file input for picture
+if (profilePicBtn) {
+  profilePicBtn.addEventListener('click', () => {
+    profilePicInput?.click();
+  });
+}
+
+// Handle picture upload
+if (profilePicInput) {
+  profilePicInput.addEventListener('change', (e: Event) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file && profileDisplayPic) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const result = event.target?.result as string;
+        profileDisplayPic.src = result;
+        userProfileData.profilePicture = result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+// Load profile data
+function loadProfileData() {
+  if (currentUser) {
+    (document.getElementById('profile-username') as HTMLInputElement).value = currentUser.username;
+    (document.getElementById('profile-role') as HTMLInputElement).value = currentUser.role;
+    (document.getElementById('profile-email') as HTMLInputElement).value = currentUser.email || '';
+    (document.getElementById('profile-phone') as HTMLInputElement).value = currentUser.phone || '';
+    (document.getElementById('profile-bio') as HTMLTextAreaElement).value = currentUser.bio || '';
+    
+    // Initialize profile data with current user data
+    userProfileData.email = currentUser.email || '';
+    userProfileData.phone = currentUser.phone || '';
+    userProfileData.bio = currentUser.bio || '';
+    userProfileData.profilePicture = currentUser.profilePicture || null;
+    
+    if (currentUser.profilePicture && profileDisplayPic) {
+      profileDisplayPic.src = currentUser.profilePicture;
+    } else if (profileDisplayPic) {
+      const icon = currentUser.role === 'admin'
+        ? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
+        : 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
+      profileDisplayPic.src = icon;
+    }
+  }
+}
+
+// Save profile data
+if (profileForm) {
+  profileForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    userProfileData.email = (document.getElementById('profile-email') as HTMLInputElement).value;
+    userProfileData.phone = (document.getElementById('profile-phone') as HTMLInputElement).value;
+    userProfileData.bio = (document.getElementById('profile-bio') as HTMLTextAreaElement).value;
+    
+    try {
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('userId', currentUser!.id.toString());
+      formData.append('email', userProfileData.email);
+      formData.append('phone', userProfileData.phone);
+      formData.append('bio', userProfileData.bio);
+      
+      // Only append profile picture if it was changed
+      if (userProfileData.profilePicture && userProfileData.profilePicture.startsWith('data:image')) {
+        // Convert base64 to blob
+        const response = await fetch(userProfileData.profilePicture);
+        const blob = await response.blob();
+        const file = new File([blob], 'profile-picture.jpg', { type: 'image/jpeg' });
+        formData.append('profilePicture', file);
+      }
+      
+      const res = await fetch('/api/auth/profile', {
+        method: 'POST',
+        body: formData,
+        // Don't set Content-Type header - let browser set it with boundary for FormData
+      });
+      
+      const result = await res.json();
+      
+      if (result.success) {
+        // Update currentUser with new profile data
+        currentUser = { ...currentUser, ...result.user } as User;
+        alert('Profile updated successfully!');
+        renderUserInfo();
+        if (profileModal) profileModal.style.display = 'none';
+      } else {
+        alert('Failed to update profile');
+      }
+    } catch (error) {
+      alert('Error updating profile: ' + (error as Error).message);
+    }
+  });
+}

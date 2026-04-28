@@ -19,11 +19,12 @@
 <header>
 <nav class="navbar">
 <div class="logo">Visitor Logbook</div>
+<div class="navbar-right">
 <div id="user-info"></div>
-
 <button id="logout-btn" style="display:none;">
     Logout
 </button>
+</div>
 </nav>
 </header>
 
@@ -292,6 +293,53 @@ or <a href="#" id="show-login">Login</a>
 </div>
 
 </section>
+
+<!-- PROFILE MODAL -->
+<div id="profile-modal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Profile Settings</h2>
+      <button class="modal-close" id="profile-modal-close">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="profile-picture-section">
+        <img id="profile-display-pic" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Profile Picture" class="profile-pic-large">
+        <input type="file" id="profile-pic-input" accept="image/*" style="display:none;">
+        <button type="button" id="profile-pic-btn" class="btn-secondary">Change Picture</button>
+      </div>
+
+      <form id="profile-form">
+        <div class="form-group">
+          <label for="profile-username">Username</label>
+          <input type="text" id="profile-username" readonly>
+        </div>
+
+        <div class="form-group">
+          <label for="profile-email">Email</label>
+          <input type="email" id="profile-email" placeholder="Enter your email">
+        </div>
+
+        <div class="form-group">
+          <label for="profile-phone">Phone</label>
+          <input type="tel" id="profile-phone" placeholder="Enter your phone number">
+        </div>
+
+        <div class="form-group">
+          <label for="profile-role">Role</label>
+          <input type="text" id="profile-role" readonly>
+        </div>
+
+        <div class="form-group">
+          <label for="profile-bio">Bio</label>
+          <textarea id="profile-bio" placeholder="Enter your bio" rows="4"></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary">Save Changes</button>
+      </form>
+    </div>
+  </div>
+</div>
 
 </main>
 

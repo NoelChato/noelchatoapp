@@ -3,14 +3,26 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class UserEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ unique: true })
-  username: string;
+  username!: string;
 
   @Column()
-  password: string; // hashed
+  password!: string; // hashed
 
   @Column()
-  role: string;
+  role!: string;
+
+  @Column({ nullable: true })
+  email?: string;
+
+  @Column({ nullable: true })
+  phone?: string;
+
+  @Column({ nullable: true, type: 'longtext' })
+  bio?: string;
+
+  @Column({ nullable: true, type: 'longtext' })
+  profilePicture?: string;
 }

@@ -28,16 +28,15 @@ const logoutBtn = document.getElementById('logout-btn');
 
 if (currentUser) {
 
-    const icon = currentUser.role === 'admin'
+    const icon = currentUser.profilePicture 
+        ? currentUser.profilePicture
+        : currentUser.role === 'admin'
         ? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
         : 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 
     if (info) {
         info.innerHTML =
-            '<span style="display:flex;align-items:center;gap:6px;">' +
-            '<img src="' + icon + '" style="width:18px;height:18px;border-radius:50%;">' +
-            ' Logged in as ' + currentUser.username + ' (' + currentUser.role + ')' +
-            '</span>';
+            '<img src="' + icon + '" style="width:36px;height:36px;border-radius:50%;cursor:pointer;" title="' + currentUser.username + ' (' + currentUser.role + ')" alt="Profile">';
     }
 
     if (name) name.textContent = currentUser.username;
@@ -644,5 +643,146 @@ if (targetPanelId === 'panel-reports') {
 });
 
 });
+
+
+/* ---------- PROFILE MODAL ---------- */
+
+const profileIconDiv = document.getElementById('user-info');
+const profileModal = document.getElementById('profile-modal');
+const profileModalClose = document.getElementById('profile-modal-close');
+const profilePicBtn = document.getElementById('profile-pic-btn');
+const profilePicInput = document.getElementById('profile-pic-input');
+const profileDisplayPic = document.getElementById('profile-display-pic');
+const profileForm = document.getElementById('profile-form');
+
+let userProfileData = {
+  email: '',
+  phone: '',
+  bio: '',
+  profilePicture: null
+};
+
+// Open profile modal
+if (profileIconDiv) {
+  profileIconDiv.addEventListener('click', function() {
+    if (currentUser) {
+      profileModal.style.display = 'flex';
+      loadProfileData();
+    }
+  });
+}
+
+// Close modal
+if (profileModalClose) {
+  profileModalClose.addEventListener('click', function() {
+    profileModal.style.display = 'none';
+  });
+}
+
+// Close modal on outside click
+if (profileModal) {
+  profileModal.addEventListener('click', function(e) {
+    if (e.target === profileModal) {
+      profileModal.style.display = 'none';
+    }
+  });
+}
+
+// Open file input for picture
+if (profilePicBtn) {
+  profilePicBtn.addEventListener('click', function() {
+    profilePicInput.click();
+  });
+}
+
+// Handle picture upload
+if (profilePicInput) {
+  profilePicInput.addEventListener('change', async function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        profileDisplayPic.src = event.target.result;
+        userProfileData.profilePicture = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+// Load profile data
+function loadProfileData() {
+  if (currentUser) {
+    document.getElementById('profile-username').value = currentUser.username;
+    document.getElementById('profile-role').value = currentUser.role;
+    document.getElementById('profile-email').value = currentUser.email || '';
+    document.getElementById('profile-phone').value = currentUser.phone || '';
+    document.getElementById('profile-bio').value = currentUser.bio || '';
+    
+    // Initialize profile data with current user data
+    userProfileData.email = currentUser.email || '';
+    userProfileData.phone = currentUser.phone || '';
+    userProfileData.bio = currentUser.bio || '';
+    userProfileData.profilePicture = currentUser.profilePicture || null;
+    
+    if (currentUser.profilePicture) {
+      profileDisplayPic.src = currentUser.profilePicture;
+    } else {
+      const icon = currentUser.role === 'admin'
+        ? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
+        : 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
+      profileDisplayPic.src = icon;
+    }
+  }
+}
+
+// Save profile data
+if (profileForm) {
+  profileForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    userProfileData.email = document.getElementById('profile-email').value;
+    userProfileData.phone = document.getElementById('profile-phone').value;
+    userProfileData.bio = document.getElementById('profile-bio').value;
+    
+    try {
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('userId', currentUser.id.toString());
+      formData.append('email', userProfileData.email);
+      formData.append('phone', userProfileData.phone);
+      formData.append('bio', userProfileData.bio);
+      
+      // Only append profile picture if it was changed
+      if (userProfileData.profilePicture && userProfileData.profilePicture.startsWith('data:image')) {
+        // Convert base64 to blob
+        const response = await fetch(userProfileData.profilePicture);
+        const blob = await response.blob();
+        const file = new File([blob], 'profile-picture.jpg', { type: 'image/jpeg' });
+        formData.append('profilePicture', file);
+      }
+      
+      const res = await fetch('/api/auth/profile', {
+        method: 'POST',
+        body: formData,
+        // Don't set Content-Type header - let browser set it with boundary for FormData
+      });
+      
+      const result = await res.json();
+      
+      if (result.success) {
+        // Update currentUser with new profile data
+        currentUser = { ...currentUser, ...result.user };
+        alert('Profile updated successfully!');
+        renderUserInfo();
+        profileModal.style.display = 'none';
+      } else {
+        alert('Failed to update profile');
+      }
+    } catch (error) {
+      alert('Error updating profile: ' + error.message);
+    }
+  });
+}
 
 });
