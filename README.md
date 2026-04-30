@@ -71,47 +71,51 @@ To monitor and review visitor records stored in the system.
 
 ## How to Run the Project
 
+How to Run the Project
 
 Follow the steps below to set up and run the application on your local machine:
 
 1. Clone the Repository
-git clone https://github.com/your-username/visitor-logbook-system.git
-cd visitor-logbook-system
+
+  git clone https://github.com/your-username/visitor-logbook-system.git
+  cd visitor-logbook-system
+
 2. Install Dependencies
 
 Make sure you have Node.js installed, then run:
 
-npm install
+  npm install
+
 3. Set Up the Database
 
 If your project uses a database (e.g., SQLite, MySQL, or PostgreSQL), configure it first.
 
 Example for SQLite:
 
-# Make sure the database file exists
-touch data/db.sqlite
+  # Make sure the database file exists
+  touch data/db.sqlite
 
-If using environment variables, create a .env file:
+  If using environment variables, create a .env file:
 
-DATABASE_URL=your_database_connection_here
-PORT=3000
+  DATABASE_URL=your_database_connection_here
+  PORT=3000
+
 4. Run the Application
 
-Start the NestJS server:
+ Start the NestJS server:
 
-npm run start
+  npm run start
 
-For development mode (auto-reload):
+ For development mode (auto-reload):
 
-npm run start:dev
+  npm run start:dev
+
 5. Open in Browser
 
 Go to:
 
-http://localhost:3000
-6. (Optional) Build for Production
-npm run build
-npm run start:prod
+  http://localhost:3000
+
 
 ---
 
