@@ -202,13 +202,23 @@ const ctx = document.getElementById("visitorChart");
 
 if(ctx){
 
+// Calculate visitor counts for the last 7 days
+let today = new Date();
+let dates = [];
+for(let i=6; i>=0; i--){
+    let d = new Date(today);
+    d.setDate(d.getDate() - i);
+    dates.push(d.toISOString().split('T')[0]);
+}
+let data = dates.map(date => visitors.filter(v => v.date === date).length);
+
 new Chart(ctx,{
 type:'line',
 data:{
 labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
 datasets:[{
 label:'Visitors',
-data:[5,8,6,10,12,7,9],
+data: data,
 fill:true,
 tension:0.3
 }]
