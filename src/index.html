@@ -284,8 +284,41 @@ or <a href="#" id="show-login">Login</a>
 <!-- SETTINGS -->
 <div id="panel-settings" class="panel" style="display:none;">
 
-<h2>Settings</h2>
-<p>Feature placeholders go here.</p>
+  <h2>Settings</h2>
+  <div class="settings-card">
+    <h3>General Settings</h3>
+    <div class="settings-row">
+      <label for="setting-dashboard-view">Default dashboard view</label>
+      <select id="setting-dashboard-view">
+        <option value="summary">Summary</option>
+        <option value="log">Visitor Log</option>
+        <option value="reports">Reports</option>
+      </select>
+    </div>
+    <div class="settings-row">
+      <label for="setting-notifications">Enable notifications</label>
+      <input type="checkbox" id="setting-notifications" checked>
+    </div>
+  </div>
+
+  <div class="settings-card">
+    <h3>Appearance</h3>
+    <div class="settings-row">
+      <label for="setting-theme">Theme</label>
+      <select id="setting-theme">
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="settings-card">
+    <h3>Security</h3>
+    <div class="settings-row">
+      <label for="setting-password">Change password</label>
+      <button type="button" id="setting-password" class="btn-secondary">Update password</button>
+    </div>
+  </div>
 
 </div>
 
